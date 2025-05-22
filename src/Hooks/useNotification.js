@@ -15,7 +15,7 @@ const useNotification = () => {
   };
 
   const success = (message, description, options = {}) => {
-    showNotification('success', message, description, options)();
+    showNotification('success', message, description, options);
   };
 
   const info = (message, description, options = {}) => {

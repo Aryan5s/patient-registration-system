@@ -10,9 +10,9 @@ const initialFormData = {
 };
 
 const PatientRegistrationForm = (props) => {
-  const { contextHolder, success, info, warning, error } = useNotification();
   const {db , broadcastSync} = props;
-  console.log(db);
+  const { contextHolder, success, error} = useNotification();
+
   const [formData, setFormData] = useState(initialFormData);
 
   const handleChange = (field) => (e) => {
@@ -23,29 +23,26 @@ const PatientRegistrationForm = (props) => {
   };
 
   const handleSubmit = async () => {
-
+    
     const {name , age , gender} = formData
-    const id = 1;
     // Execute Pglite query over here 
       try {
-        debugger;
-      await db.exec(`INSERT INTO patients (id , name, age, gender) VALUES (${id}, ${name.trim()}, ${parseInt(age)}, ${gender?.trim() || null})`);
-      success({
-        message: 'Patient Registered',
-        description: `${name} has been added successfully.`,
-      });
+      const result = await db.query('INSERT INTO patients (name, age, gender) VALUES ($1 , $2 , $3)', [name , age , gender],);
+      success('Patient Registered', `${name} has been added successfully.`); // Use the success function
       broadcastSync();
     } catch (err) {
-        console.warn(err.message)
-      error({
-        message: 'Error',
-        description: err.message,
-      });
+      console.log(err.message)
+      error('Error', err.message); // Use the error function
     }
+    
     setFormData(initialFormData);
   };
 
   return (
+    <>
+    {/*The context holder is responsible for showing notification messages based on the result of the query*/}
+    {contextHolder}
+
     <Form
       layout="vertical"
       onFinish={handleSubmit}
@@ -89,6 +86,7 @@ const PatientRegistrationForm = (props) => {
         </Button>
       </Form.Item>
     </Form>
+    </>
   );
 };
 

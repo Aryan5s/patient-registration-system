@@ -15,7 +15,7 @@ const usePgliteDb = () => {
       const db = new PGlite(`idb://${DB_NAME}`);
       await db.exec(createPatientsTable);
       const schema = await db.query('SELECT * FROM patients');
-      console.log('DB Schema:', schema, db);
+      console.log(schema.rows);
       setDb(db);
       setInitDone(true);
     } catch (err) {
