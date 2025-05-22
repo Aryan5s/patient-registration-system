@@ -1,6 +1,7 @@
 import { Tabs, Layout, Typography } from 'antd';
 import './styles/common.css'
 import PatientRegistrationForm from './Components/PatientRegistrationForm';
+import SqlQueryTool from './Components/SqlQueryTool';
 import usePgliteDb from './Hooks/usePgliteDb';
 
 const { Title } = Typography;
@@ -17,7 +18,12 @@ function App() {
       key: '1',
       label: 'Patient Registration',
       children: <PatientRegistrationForm db = {db} broadcastSync = {broadcastSync}/>,
-    }
+    },
+     {
+      key: '2',
+      label: 'Run SQL Query',
+      children: <SqlQueryTool db={db} />,
+    },
   ];
 
   return (
