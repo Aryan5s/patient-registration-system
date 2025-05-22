@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, notification } from 'antd';
 import { PatientRegistrationFormRules } from '../Common/GlobalRules';
+import useNotification from '../Hooks/useNotification';
 
 const initialFormData = {
   name: '',
@@ -8,7 +9,10 @@ const initialFormData = {
   gender: '',
 };
 
-const PatientRegistrationForm = () => {
+const PatientRegistrationForm = (props) => {
+  const { contextHolder, success, info, warning, error } = useNotification();
+  const {db , broadcastSync} = props;
+  console.log(db);
   const [formData, setFormData] = useState(initialFormData);
 
   const handleChange = (field) => (e) => {
@@ -19,7 +23,25 @@ const PatientRegistrationForm = () => {
   };
 
   const handleSubmit = async () => {
+
+    const {name , age , gender} = formData
+    const id = 1;
     // Execute Pglite query over here 
+      try {
+        debugger;
+      await db.exec(`INSERT INTO patients (id , name, age, gender) VALUES (${id}, ${name.trim()}, ${parseInt(age)}, ${gender?.trim() || null})`);
+      success({
+        message: 'Patient Registered',
+        description: `${name} has been added successfully.`,
+      });
+      broadcastSync();
+    } catch (err) {
+        console.warn(err.message)
+      error({
+        message: 'Error',
+        description: err.message,
+      });
+    }
     setFormData(initialFormData);
   };
 

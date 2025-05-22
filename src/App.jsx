@@ -1,17 +1,22 @@
 import { Tabs, Layout, Typography } from 'antd';
 import './styles/common.css'
 import PatientRegistrationForm from './Components/PatientRegistrationForm';
+import usePgliteDb from './Hooks/usePgliteDb';
 
 const { Title } = Typography;
 const { Content } = Layout;
 
 function App() {
 
+  const { db, initDone, broadcastSync } = usePgliteDb();
+
+  if (!initDone) return <p>Loading database...</p>;
+
   const items = [
     {
       key: '1',
       label: 'Patient Registration',
-      children: <PatientRegistrationForm/>,
+      children: <PatientRegistrationForm db = {db} broadcastSync = {broadcastSync}/>,
     }
   ];
 
