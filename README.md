@@ -35,7 +35,7 @@ A modern web application for managing patient records with real-time multi-tab s
 
 ## 🌐 Live Demo
 
-🔗 **Try it here:** [https://elegant-granita-d45c41.netlify.app/](#)
+🔗 **Try it here:** [https://elegant-granita-d45c41.netlify.app/](https://elegant-granita-d45c41.netlify.app/)
 
 
 ## 📦 Setup & Installation
