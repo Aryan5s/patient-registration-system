@@ -1,10 +1,9 @@
-// useNotification.js
 import { notification } from 'antd';
 
+// Custom Hook for Notifications
 const useNotification = () => {
   const [api, contextHolder] = notification.useNotification();
   const showNotification = (type, message, description, options = {}) => {
-    console.log(api, type)
     api[type]({
       message,
       description,

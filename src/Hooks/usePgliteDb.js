@@ -1,6 +1,4 @@
-// src/Hooks/usePgliteDb.js
 import { useEffect, useState, useRef } from 'react';
-import { selectAllPatients } from '../Common/GlobalQueries';
 
 let requestIdCounter = 0;
 const generateRequestId = () => `req-${requestIdCounter++}`;
@@ -95,13 +93,7 @@ const usePgliteDb = () => {
     };
   }, []);
 
-  // `broadcastSync` is now completely redundant for data sync and can be removed
-  // from here and any component that uses it (e.g., App.js, PatientRegistrationForm.js).
-  const broadcastSync = () => {
-    console.log("[usePgliteDb] broadcastSync is no longer used for data synchronization with Shared Worker.");
-  };
-
-  return { db, initDone, broadcastSync, patientsData, fetchAllPatients };
+  return { db, initDone, patientsData, fetchAllPatients };
 };
 
 export default usePgliteDb;

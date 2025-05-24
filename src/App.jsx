@@ -1,10 +1,11 @@
 // src/App.js
 import { Tabs, Layout, Typography } from 'antd';
 import './styles/common.css'
+import './App.css'
+import usePgliteDb from './Hooks/usePgliteDb';
 import PatientRegistrationForm from './Components/PatientRegistrationForm';
 import SqlQueryTool from './Components/SqlQueryTool';
 import AppLoading from './Components/AppLoading';
-import usePgliteDb from './Hooks/usePgliteDb';
 
 const { Title } = Typography;
 const { Content } = Layout;
@@ -34,7 +35,6 @@ function App() {
     <Layout style={{ padding: '2rem', minHeight: '100vh' }}>
       <Content>
         <Title level={2}>Patient Management System</Title>
-        {/* CORRECTED PROP NAME for Ant Design Tabs */}
         <Tabs defaultActiveKey="1" items={items}/>
       </Content>
     </Layout>
