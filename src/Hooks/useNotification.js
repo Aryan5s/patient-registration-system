@@ -3,7 +3,6 @@ import { notification } from 'antd';
 
 const useNotification = () => {
   const [api, contextHolder] = notification.useNotification();
-  console.log(api)
   const showNotification = (type, message, description, options = {}) => {
     console.log(api, type)
     api[type]({
