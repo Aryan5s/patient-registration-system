@@ -1,68 +1,108 @@
-import React, { useState } from "react";
-import { Input, Button, Table, Typography, notification } from "antd";
-import useNotification from "antd/es/notification/useNotification";
+// src/Components/SqlQueryTool.js
+import { useState, useEffect } from "react";
+import { Input, Table, Typography } from "antd";
+import useNotification from "../Hooks/useNotification";
+import { patientColumns } from "../Common/GlobalSchemas";
 
 const { Title } = Typography;
 
-function SqlQueryTool({ db }) {
-  const { contexHolder, success, info, error } = useNotification();
-  const [sql, setSql] = useState("");
-  const [result, setResult] = useState(null);
+// Receive db (which talks to worker) and patientsData
+function SqlQueryTool({ db, patientsData }) { // No need for fetchAllPatients here unless a custom query should trigger it
+  const { contextHolder, success, info, error } = useNotification();
+  const [sqlQuery, setSqlQuery] = useState(""); // Renamed from sqlQuery to be consistent
+  const [queryResult, setQueryResult] = useState(null);
+
+  useEffect(() => {
+    console.log('[SqlQueryTool] patientsData prop updated:', patientsData);
+     setQueryResult({
+        columns: patientColumns,
+        dataSource: patientsData.map((row, index) => ({ ...row, key: row.id || index })),
+      });
+  }, [patientsData]);
+
+  useEffect(() => {
+    // If there's no custom query result, ensure the table shows the full patientsData.
+    if (!queryResult && sqlQuery === "") {
+      setQueryResult({
+        columns: patientColumns,
+        dataSource: patientsData.map((row, index) => ({ ...row, key: row.id || index })),
+      });
+    }
+  }, [patientsData, queryResult, sqlQuery]);
+
+  const handleQueryChange = (e) => {
+    setSqlQuery(e.target.value);
+    if (e.target.value === "") setQueryResult(null);
+  };
 
   const handleQuery = async () => {
+    // Ensure db is available before querying
+    if (!db) {
+        error("Database not initialized", "Please wait for the database to connect.");
+        return;
+    }
     try {
-      const res = await db.query(sql);
-
+      // db.query now sends the SQL to the shared worker
+      const res = await db.query(sqlQuery);
+      console.log(res);
       if (res.rows.length === 0) {
         info("No Data", "Query executed successfully but returned no rows.");
-        setResult(null);
+        setQueryResult(null);
         return;
       }
 
-      const columns = [
-        { title: "ID", dataIndex: "id", key: "id" },
-        { title: "Name", dataIndex: "name", key: "name"},
-        { title: "Age", dataIndex: "age", key: "age"},
-        { title: "Gender", dataIndex: "gender", key: "gender"}
-      ];
+      const dynamicColumns = Object.keys(res.rows[0] || {}).map(key => ({
+        title: key.charAt(0).toUpperCase() + key.slice(1),
+        dataIndex: key,
+        key: key,
+      }));
 
       const dataSource = res.rows.map((row, index) => ({
-        key: index,
+        key: row.id || index,
         ...row,
       }));
 
-      setResult({ columns, dataSource });
-      success('Query Successful', `${res.rows.length} records have been fetched successfullly`); // Use the success function
+      setQueryResult({ columns: dynamicColumns, dataSource });
+      success('Query Successful', `${res.rows.length} records have been fetched successfully`);
     } catch (err) {
-      error("SQL Error", err.message);
-      setResult(null);
+      error("SQL Query Error", err.message);
+      setQueryResult(null);
     }
   };
 
-  return (
-    <div>
-      {contexHolder}
-      <Input.Search
-        value={sql}
-        enterButton="Run SQL"
-        onChange={(e) => setSql(e.target.value)}
-        onSearch={handleQuery}
-        style={{ marginBottom: "1.5rem" }}
-        placeholder="Enter SQL query"
-      />
+  const currentDataSource = queryResult ? queryResult.dataSource : patientsData.map((row, index) => ({ ...row, key: row.id || index }));
+  const currentColumns = queryResult ? queryResult.columns : patientColumns;
 
-      {result && (
-        <>
-          <Title level={4}>Query Result</Title>
-          <Table
-            columns={result.columns}
-            dataSource={result.dataSource}
-            pagination={{ pageSize: 5 }}
-            bordered
-          />
-        </>
-      )}
-    </div>
+  return (
+    <>
+      {contextHolder}
+      <div>
+        <Input.Search
+          value={sqlQuery}
+          enterButton="Run Query"
+          onChange={handleQueryChange}
+          onSearch={handleQuery}
+          style={{ marginBottom: "1.5rem" }}
+          placeholder="Enter SQL query (e.g., SELECT * FROM patients;)"
+        />
+
+        {currentDataSource.length > 0 ? (
+          <>
+            <Title level={4}>
+              {queryResult ? "Custom Query Result" : "All Registered Patients (Synced)"}
+            </Title>
+            <Table
+              columns={currentColumns}
+              dataSource={currentDataSource}
+              pagination={{ pageSize: 5 }}
+              bordered
+            />
+          </>
+        ) : (
+          <p>No data to display. Register a patient or run a query.</p>
+        )}
+      </div>
+    </>
   );
 }
 
