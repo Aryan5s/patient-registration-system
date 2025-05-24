@@ -1,0 +1,28 @@
+/* AppLoading.css */
+
+.page-container {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  color: #333;
+  text-align: center;
+  padding: 20px;
+}
+
+.loading-icon {
+  font-size: 60px;
+  color: #1890ff;
+}
+
+.app-title {
+  margin-top: 20px;
+  color: #001529;
+}
+
+.subtitle {
+  font-size: 18px;
+  color: #595959;
+}
+
+.secondary-text {
+  margin-top: 10px;
+}
